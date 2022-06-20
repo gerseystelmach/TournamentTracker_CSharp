@@ -41,5 +41,25 @@ namespace TrackerUI
         {
 
         }
+
+        private void tournamentLabel_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void label1_Click_2(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click_3(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TournamentViewerForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
