@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace TrackerLibrary
 {
+    /// <summary>
+    /// Represents a matchup from the tournament. Which means, one team vs another. 
+    /// </summary>
     public class MatchupModel
     {
         public List<MatchupEntryModel> Entries { get; set; } = new List<MatchupEntryModel>();
-
+        
         public TeamModel Winner { get; set; }
         public int MatchupRound { get; set; }
     }
