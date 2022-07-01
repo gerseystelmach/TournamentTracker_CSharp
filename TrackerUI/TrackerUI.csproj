@@ -8,4 +8,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="CreatePrizeForm.cs" />
+    <Compile Remove="CreatePrizeForm.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="CreatePrizeForm.resx" />
+  </ItemGroup>
+
 </Project>

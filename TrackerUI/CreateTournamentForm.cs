@@ -16,5 +16,25 @@ namespace TrackerUI
         {
             InitializeComponent();
         }
+
+        private void tournamentLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tournamentNameTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
