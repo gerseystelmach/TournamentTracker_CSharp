@@ -3,7 +3,7 @@
     partial class TournamentDashboardForm
     {
         /// <summary>
-        /// Required designer variable.
+        /// Create Tournament Dashboard form. This is the entrypoint for the application.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 

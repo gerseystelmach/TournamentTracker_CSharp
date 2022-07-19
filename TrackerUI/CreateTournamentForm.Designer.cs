@@ -3,7 +3,7 @@
     partial class CreateTournamentForm
     {
         /// <summary>
-        /// Required designer variable.
+        ///  Create Tournament form.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 

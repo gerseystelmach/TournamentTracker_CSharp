@@ -3,7 +3,7 @@
     partial class CreateTeamForm
     {
         /// <summary>
-        /// Required designer variable.
+        /// Create team form.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 

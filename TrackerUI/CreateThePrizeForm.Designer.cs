@@ -3,7 +3,7 @@
     partial class createPrizeForm
     {
         /// <summary>
-        /// Required designer variable.
+        /// Create prize form.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 

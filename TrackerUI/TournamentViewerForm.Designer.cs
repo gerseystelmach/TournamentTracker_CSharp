@@ -3,7 +3,7 @@
     partial class TournamentViewerForm
     {
         /// <summary>
-        ///  Required designer variable.
+        ///  Tournament view form.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
