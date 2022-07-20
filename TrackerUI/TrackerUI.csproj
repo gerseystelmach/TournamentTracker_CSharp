@@ -17,4 +17,8 @@
     <EmbeddedResource Remove="CreatePrizeForm.resx" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TrackerLibrary\TrackerLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

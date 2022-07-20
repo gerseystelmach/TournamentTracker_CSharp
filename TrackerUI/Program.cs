@@ -11,8 +11,11 @@ namespace TrackerUI
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+            // Initialize the database/files connections 
+            TrackerLibrary.GlobalConfig.InitializeConnections(true, true);
             // Starting point for the application
-            Application.Run(new TournamentDashboardForm());
+            //Application.Run(new TournamentDashboardForm());
+            Application.Run(new createPrizeForm());
         }
     }
 }

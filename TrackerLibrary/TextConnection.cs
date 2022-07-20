@@ -10,7 +10,10 @@ namespace TrackerLibrary
     {
         public PrizeModel CreatePrize(PrizeModel model)
         {
-            throw new NotImplementedException();
+            // TODO - Wire up the CreatePrize for text files.
+            model.Id = 1;
+
+            return model;
         }
     }
 }
