@@ -11,6 +11,38 @@ namespace TrackerLibrary
     /// </summary>
     public class PrizeModel
     {
+
+        public PrizeModel()
+        {
+
+        }
+        /// <summary>
+        /// This constructor process the data recovered as string and convert it to the expected model properties types. 
+        /// </summary>
+        /// <param name="placeNumber"></param>
+        /// <param name="placeName"></param>
+        /// <param name="prizeAmount"></param>
+        /// <param name="prizePercentage"></param>
+        public PrizeModel(string placeNumber, string placeName, string prizeAmount, string prizePercentage)
+        {
+          
+            PlaceName = placeName;
+           
+            int placeNumberValue = 0;
+            // If the parse goes wrong, the placeNumberValue will remain 0.
+            int.TryParse(placeNumber, out placeNumberValue);
+            PlaceNumber = placeNumberValue;
+
+            decimal prizeAmountValue = 0;
+            decimal.TryParse(prizeAmount, out prizeAmountValue);
+            PrizeAmount = prizeAmountValue;
+
+            double prizePercentageValue = 0;
+            double.TryParse(prizePercentage, out prizePercentageValue);
+            PrizePercentage = prizePercentageValue;
+        }
+
+
         /// <summary>
         /// Represents the unique identifier of the prize.
         /// </summary>
