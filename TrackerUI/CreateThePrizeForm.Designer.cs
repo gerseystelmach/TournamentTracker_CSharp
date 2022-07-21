@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(createPrizeForm));
             this.tournamentNameTextBox = new System.Windows.Forms.TextBox();
             this.placeNumberLabel = new System.Windows.Forms.Label();
             this.tournamentLabel = new System.Windows.Forms.Label();
@@ -62,7 +61,6 @@
             this.placeNumberLabel.Size = new System.Drawing.Size(252, 50);
             this.placeNumberLabel.TabIndex = 13;
             this.placeNumberLabel.Text = "Place Number";
-            this.placeNumberLabel.Click += new System.EventHandler(this.prizeNumberLabel_Click);
             // 
             // tournamentLabel
             // 
@@ -84,7 +82,6 @@
             this.placeNumberValue.Name = "placeNumberValue";
             this.placeNumberValue.Size = new System.Drawing.Size(280, 37);
             this.placeNumberValue.TabIndex = 14;
-            this.placeNumberValue.TextChanged += new System.EventHandler(this.prizeNumberValue_TextChanged);
             // 
             // prizeAmountValue
             // 
@@ -94,7 +91,6 @@
             this.prizeAmountValue.Size = new System.Drawing.Size(280, 37);
             this.prizeAmountValue.TabIndex = 18;
             this.prizeAmountValue.Text = "0";
-            this.prizeAmountValue.TextChanged += new System.EventHandler(this.prizeAmountValue_TextChanged);
             // 
             // prizeAmountLabel
             // 
@@ -126,9 +122,9 @@
             this.placeNameLabel.Location = new System.Drawing.Point(51, 229);
             this.placeNameLabel.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.placeNameLabel.Name = "placeNameLabel";
-            this.placeNameLabel.Size = new System.Drawing.Size(209, 50);
+            this.placeNameLabel.Size = new System.Drawing.Size(215, 50);
             this.placeNameLabel.TabIndex = 19;
-            this.placeNameLabel.Text = "Prize Name";
+            this.placeNameLabel.Text = "Place Name";
             // 
             // prizePercentageValue
             // 
@@ -138,7 +134,6 @@
             this.prizePercentageValue.Size = new System.Drawing.Size(280, 37);
             this.prizePercentageValue.TabIndex = 22;
             this.prizePercentageValue.Text = "0";
-            this.prizePercentageValue.TextChanged += new System.EventHandler(this.prizePercentageValue_TextChanged);
             // 
             // prizePercentageLabel
             // 
@@ -199,7 +194,6 @@
             this.Controls.Add(this.tournamentNameTextBox);
             this.Controls.Add(this.placeNumberLabel);
             this.Controls.Add(this.tournamentLabel);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "createPrizeForm";
             this.Text = "Create Prize ";
             this.ResumeLayout(false);

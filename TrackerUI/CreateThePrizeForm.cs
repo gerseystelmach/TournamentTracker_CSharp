@@ -30,11 +30,12 @@ namespace TrackerUI
             if (ValidateForm())
             {
                 PrizeModel model = new PrizeModel(
-                    placeNameValue.Text, 
-                    placeNumberValue.Text, 
+                    placeNumberValue.Text,
+                    placeNameValue.Text,     
                     prizeAmountValue.Text, 
                     prizePercentageValue.Text);
 
+                // Creating the Prize for each Connector that implements the IDataConnection
                 foreach (IDataConnection db in GlobalConfig.Connections)
                 {
                     db.CreatePrize(model);
@@ -104,26 +105,6 @@ namespace TrackerUI
             placeNumberValue.Text = "";
             prizeAmountValue.Text = "0";
             prizePercentageValue.Text = "0";
-        }
-
-        private void prizeNumberValue_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void prizeNumberLabel_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void prizePercentageValue_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void prizeAmountValue_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
