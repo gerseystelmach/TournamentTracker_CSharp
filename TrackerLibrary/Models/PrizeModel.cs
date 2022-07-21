@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackerLibrary
+namespace TrackerLibrary.Models
 {
     /// <summary>
     /// Represents a prize from a tournment. 
@@ -25,9 +25,9 @@ namespace TrackerLibrary
         /// <param name="prizePercentage"></param>
         public PrizeModel(string placeNumber, string placeName, string prizeAmount, string prizePercentage)
         {
-          
+
             PlaceName = placeName;
-           
+
             int placeNumberValue = 0;
             // If the parse goes wrong, the placeNumberValue will remain 0.
             int.TryParse(placeNumber, out placeNumberValue);
