@@ -34,15 +34,12 @@ namespace TrackerUI
                     placeNameValue.Text,     
                     prizeAmountValue.Text, 
                     prizePercentageValue.Text);
-
-                // Creating the Prize for each Connector that implements the IDataConnection
-                foreach (IDataConnection db in GlobalConfig.Connections)
-                {
-                    db.CreatePrize(model);
-                }
+             
+                GlobalConfig.Connection.CreatePrize(model);         
 
                 // Returning the form to default values if everything goes fine with the prize saving. 
                 this.cleanFormValues();
+
             } else
             {
                 MessageBox.Show("This form has invalid information. Pleach check it and try again.");

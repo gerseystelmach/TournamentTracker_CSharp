@@ -13,22 +13,22 @@ namespace TrackerLibrary
         /// <summary>
         /// This variable will hold any Class that implements the IDataConnection.
         /// </summary>
-        public static List<IDataConnection> Connections { get; private set; } = new List<IDataConnection>();
+        public static IDataConnection Connection { get; private set; }
 
-        public static void InitializeConnections(bool database, bool textFiles)
+        public static void InitializeConnections(DatabaseType connectionType)
         {
-            if (database)
+
+            if (connectionType == DatabaseType.Sql)
             {
                 // TODO - Set up the SQL Connector properly.
                 SqlConnector sql = new SqlConnector();
-                Connections.Add(sql);
-            }
-
-            if (textFiles)
+                Connection = sql;
+            } 
+            else if (connectionType == DatabaseType.Textfile)
             {
                 // TODO - Create the Text Connection
                 TextConnector text = new TextConnector();
-                Connections.Add(text);
+                Connection = text;
             }
         }
 

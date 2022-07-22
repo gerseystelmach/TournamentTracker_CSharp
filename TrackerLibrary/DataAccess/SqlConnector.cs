@@ -7,12 +7,6 @@ using TrackerLibrary.Models;
 
 namespace TrackerLibrary.DataAccess
 {
-
- //   @PlaceNumber int,
-	//@PlaceName nvarchar(50),
-	//@PrizeAmount money,
- //   @PrizePercentage float,
-	//@id int = 0 output 
     public class SqlConnector : IDataConnection
     {
         // TODO - Make the CreatePrize method actually save to the database.
@@ -23,8 +17,6 @@ namespace TrackerLibrary.DataAccess
         /// <returns>The prize information, including the unique identifier (ID).</returns>
         public PrizeModel CreatePrize(PrizeModel model)
         {
-
-            var connectionString = "Server=DESKTOP-HK6CIIL;Database=Tournaments;Trusted_Connection=True;";
             // It will open the connection to database and then close it, so it avoids memory leeks.  
             using (IDbConnection connection = new SqlConnection(GlobalConfig.getConnectionString("Tournaments")))
             {
@@ -41,7 +33,7 @@ namespace TrackerLibrary.DataAccess
                 // Executing the insert query created in the storage procedure. 
                 connection.Execute("dbo.spPrizes_Insert", param, commandType: CommandType.StoredProcedure);
 
-                // Recovering the Id created in the store procedure scope, when inserting the object into db
+                // Recovering the Id created in the stored procedure scope, when inserting the object into db
                 model.Id = param.Get<int>("@id");
 
                 return model;
