@@ -11,10 +11,10 @@ namespace TrackerLibrary.DataAccess
     public class TextConnector : IDataConnection
     {
         private const string PrizesFile = "PrizeModels.csv";
-        // TODO - Wire up the CreatePrize for text files.
+        private const string PeopleFile = "PersonModels.csv";
 
         /// <summary>
-        /// Finding the last id to create a new prize in a text file. 
+        /// Create a new prize in a text file by finding the last id record in database. 
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -45,6 +45,51 @@ namespace TrackerLibrary.DataAccess
             prizes.SaveToPrizeFile(PrizesFile);
 
             return model;
+        }
+
+        /// <summary>
+        ///  Create a new person in a text file by finding the last id record in database. 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public PersonModel CreatePerson(PersonModel model)
+        {
+            // Extension method is used to call all of these static methods, using the same parameter. 
+            // It's the same of calling individually: TextConnectorProcessor.FullFilePath(PrizesFile);
+
+            // Load the text file and convert the text to List<PrizeModel>
+            List<PersonModel> people = PeopleFile.FullFilePath().LoadFile().ConvertToPersonModels();
+
+            // Find the max id 
+            int currentId = 1;
+
+            if (people.Count > 0)
+            {
+                currentId = people.OrderByDescending(x => x.Id).First().Id + 1;
+            }
+
+            model.Id = currentId;
+
+             // Add the new record with the new Id (max + 1)
+            people.Add(model);
+
+            people.SaveToPersonFile(PeopleFile);
+
+            return model;
+        }
+
+        /// <summary>
+        /// Getting Person models from the PeopleFile.
+        /// </summary>
+        /// <returns></returns>
+        public List<PersonModel> GetPerson_All()
+        {
+            return PeopleFile.FullFilePath().LoadFile().ConvertToPersonModels();
+        }
+
+        public TeamModel CreateTeam(TeamModel model)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -61,6 +61,37 @@ namespace TrackerLibrary.DataAccess.TextHelpers
             return output;           
         }
 
+        /// <summary>
+        /// It loops a List of lines, splits each line separated by a comma and transform the substrings into a PersonModel object attributes. 
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns>A list of PersonModel objects. </returns>
+        public static List<PersonModel> ConvertToPersonModels(this List<string> lines)
+        {
+            List<PersonModel> output = new List<PersonModel>();
+
+            foreach (string line in lines)
+            {
+                string[] columns = line.Split(',');
+                PersonModel p = new PersonModel();
+
+                // Trying to convert a string to an int, otherwise it will crash. 
+                p.Id = int.Parse(columns[0]);
+                p.FirstName = columns[1];
+                p.LastName = columns[2];
+                p.EmailAddress = columns[3];
+                p.CellphoneNumber = columns[4];
+
+                output.Add(p);
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Writes a prize object into a flat file. 
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="fileName"></param>
         public static void SaveToPrizeFile(this List<PrizeModel> models, string fileName)
         {
             List<string> lines = new List<string>();
@@ -73,5 +104,25 @@ namespace TrackerLibrary.DataAccess.TextHelpers
 
             File.WriteAllLines(fileName.FullFilePath(), lines);
         }
+
+        /// <summary>
+        /// Writes a Person object into a flat file. 
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="fileName"></param>
+        public static void SaveToPersonFile(this List<PersonModel> models, string fileName)
+        {
+            List<string> lines = new List<string>();
+
+            // Converting object to string
+            foreach (PersonModel p in models)
+            {
+                lines.Add($"{p.Id}, {p.FirstName}, {p.LastName}, {p.EmailAddress}, {p.CellphoneNumber}");
+            }
+
+            File.WriteAllLines(fileName.FullFilePath(), lines);
+        }
+
+
     }
 }
