@@ -5,14 +5,17 @@ namespace TrackerUI
 {
     public partial class CreateTeamForm : Form
     {
+                
 
         private List<PersonModel> availableTeamMembers = GlobalConfig.Connection.GetPerson_All();
         private List<PersonModel> selectedTeamMembers = new List<PersonModel>();
-        public CreateTeamForm()
+        private ITeamRequestor callingForm;
+        public CreateTeamForm(ITeamRequestor caller)
         {
             InitializeComponent();
 
-          //  CreateSampleData();
+            // Making it available in the constructor level
+            callingForm = caller;
 
             WireUpLists();
         }
@@ -37,15 +40,6 @@ namespace TrackerUI
 
     
         }
-
-        private void CreateSampleData()
-        {
-            availableTeamMembers.Add(new PersonModel { FirstName = "Gersey", LastName = "Corey" });
-            availableTeamMembers.Add(new PersonModel { FirstName = "Sue", LastName = "Corey" });
-            selectedTeamMembers.Add(new PersonModel { FirstName = "Pati", LastName = "Corey" });
-            selectedTeamMembers.Add(new PersonModel { FirstName = "Lupi", LastName = "Corey" });
-        }
-
         private void createMemberButton_Click(object sender, EventArgs e)
         {
             if (ValidateForm()) {
@@ -167,11 +161,16 @@ namespace TrackerUI
                 teamModel.TeamName = teamNameValue.Text;
                 teamModel.TeamMembers = selectedTeamMembers;
                 GlobalConfig.Connection.CreateTeam(teamModel);
+
+                callingForm.TeamComplete(teamModel);
+
+                // Close the form after its completed
+                this.Close();
             } else
             {
                 MessageBox.Show("You need to fill the team name.");
             }
-            // TODO - If we aren't closing this form after creation, reset the form
+            
         }
     }
 }

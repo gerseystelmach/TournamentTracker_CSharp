@@ -15,9 +15,22 @@ namespace TrackerUI
 {
     public partial class createPrizeForm : Form
     {
-        public createPrizeForm()
+
+        /// <summary>
+        /// This will be used to pass value from a Form to another.
+        /// </summary>
+        IPrizeRequestor callingForm;
+
+        /// <summary>
+        /// Any method can call this form, as long as it implements the IPrizeRequestor interface. 
+        /// </summary>
+        /// <param name="caller"></param>
+        public createPrizeForm(IPrizeRequestor caller)
         {
             InitializeComponent();
+
+            // Making it available in the constructor level
+            callingForm = caller;
         }
 
         /// <summary>
@@ -35,7 +48,12 @@ namespace TrackerUI
                     prizeAmountValue.Text, 
                     prizePercentageValue.Text);
              
-                GlobalConfig.Connection.CreatePrize(model);         
+               GlobalConfig.Connection.CreatePrize(model);
+
+                callingForm.PrizeComplete(model);
+
+                // Closing the form instance
+                this.Close();
 
                 // Returning the form to default values if everything goes fine with the prize saving. 
                 this.cleanFormValues();
