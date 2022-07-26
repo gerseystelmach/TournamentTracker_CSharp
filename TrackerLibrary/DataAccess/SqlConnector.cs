@@ -129,5 +129,31 @@ namespace TrackerLibrary.DataAccess
 
             return output;
         }
+
+        /// <summary>
+        /// Query the database to recover all data from table Teams.
+        /// </summary>
+        /// <returns>List of TeamModel.</returns>
+        public List<TeamModel> GetTeam_All()
+        {
+            List<TeamModel> output;
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
+            {
+                // Getting all teams in db
+                output = connection.Query<TeamModel>("dbo.spTeam_GetAll").ToList();
+
+                foreach (TeamModel team in output)
+                {
+                    // Creating the parameter for the query in stored procedure
+                    var param = new DynamicParameters();
+                    param.Add("@TeamId", team.Id);
+
+                    team.TeamMembers = connection.Query<PersonModel>("dbo.spTeamMembers_GetByTeam", param, commandType: CommandType.StoredProcedure).ToList();
+                }
+            }
+
+            return output;
+        }
     }
 }
