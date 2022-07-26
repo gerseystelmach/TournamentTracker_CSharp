@@ -120,5 +120,38 @@ namespace TrackerUI
                 WireUpLists();
             }
         }
+
+        private void createTournamentButton_Click(object sender, EventArgs e)
+        {
+
+            // Validating data
+
+            decimal fee = 0;
+            // trying to convert it into decimal type,
+            // if it successful, it will send the value,
+            // if it's not, it will send a false and send the value of 0
+            bool feeAcceptable = decimal.TryParse(entryFeeValue.Text, out fee);
+
+            if (!feeAcceptable)
+            {
+                MessageBox.Show("You need to enter a valid Entry Fee.", "Invalid Fee", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // stops the process at this point
+                return;
+            }
+
+            // Create tournament entry
+
+            TournamentModel tournament = new TournamentModel();
+
+            tournament.TournamentName = tournamentNameValue.Text;
+            tournament.EntryFee = fee;
+
+            tournament.Prizes = selectedPrizes;
+            tournament.EnteredTeams = selectedTeams;
+
+            // Create all of the prizes enties
+            // Create all of the team entries
+            // Create matchups rounds
+        }
     }
 }

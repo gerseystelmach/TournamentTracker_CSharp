@@ -23,13 +23,13 @@ namespace TrackerLibrary.DataAccess
             using (IDbConnection connection = new SqlConnection(GlobalConfig.getConnectionString(databaseName)))
             {
                 var param = new DynamicParameters();
-   
+
                 // Replacing the parameters by the values of the PersonModel object.
                 param.Add("@FirstName", model.FirstName);
                 param.Add("@LastName", model.LastName);
                 param.Add("@EmailAddress", model.EmailAddress);
                 param.Add("@CellphoneNumber", model.CellphoneNumber);
-              
+
                 param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
                 // Executing the insert query created in the storage procedure. 
@@ -54,7 +54,7 @@ namespace TrackerLibrary.DataAccess
             using (IDbConnection connection = new SqlConnection(GlobalConfig.getConnectionString(databaseName)))
             {
                 var param = new DynamicParameters();
-      
+
                 // Replacing the parameters by the values of the PrizeModel object.
                 param.Add("@PlaceNumber", model.PlaceNumber);
                 param.Add("@PlaceName", model.PlaceName);
@@ -113,47 +113,96 @@ namespace TrackerLibrary.DataAccess
             }
         }
 
-
         /// <summary>
-        /// Query the database to recover all data from table Person.
+        /// Responsible to save a tournament in database.
         /// </summary>
-        /// <returns>List of PersonModel.</returns>
-        public List<PersonModel> GetPerson_All()
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public TournamentModel CreateTournament(TournamentModel model)
         {
-            List<PersonModel> output;
 
-            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
+            using (IDbConnection connection = new SqlConnection(GlobalConfig.getConnectionString(databaseName)))
             {
-                output = connection.Query<PersonModel>("dbo.spPeople_GetAll").ToList();
-            }
+                var param = new DynamicParameters();
 
-            return output;
-        }
+                param.Add("@TournamentName", model.TournamentName);
+                param.Add("@EntryFee", model.EntryFee);
+                param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-        /// <summary>
-        /// Query the database to recover all data from table Teams.
-        /// </summary>
-        /// <returns>List of TeamModel.</returns>
-        public List<TeamModel> GetTeam_All()
-        {
-            List<TeamModel> output;
 
-            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
-            {
-                // Getting all teams in db
-                output = connection.Query<TeamModel>("dbo.spTeam_GetAll").ToList();
+                connection.Execute("dbo.spTournaments_Insert", param, commandType: CommandType.StoredProcedure);
 
-                foreach (TeamModel team in output)
+                model.Id = param.Get<int>("@id");
+
+                foreach (PrizeModel prize in model.Prizes)
                 {
-                    // Creating the parameter for the query in stored procedure
-                    var param = new DynamicParameters();
-                    param.Add("@TeamId", team.Id);
+                    param = new DynamicParameters();
 
-                    team.TeamMembers = connection.Query<PersonModel>("dbo.spTeamMembers_GetByTeam", param, commandType: CommandType.StoredProcedure).ToList();
+                    param.Add("@TournamentId", model.Id);
+                    param.Add("@PrizeId", prize.Id);
+                    param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+                    connection.Execute("dbo.spTournamentPrizes_Insert", param, commandType: CommandType.StoredProcedure);
+
                 }
-            }
+                foreach (TeamModel team in model.EnteredTeams)
+                {
+                    param = new DynamicParameters();
 
-            return output;
+                    param.Add("@TournamentId", model.Id);
+                    param.Add("@TeamId", team.Id);
+                    param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+                    connection.Execute("dbo.spTournamentEntries_Insert", param, commandType: CommandType.StoredProcedure);
+
+               }
+
+            }
+            return model;
         }
     }
+
+
+    /// <summary>
+    /// Query the database to recover all data from table Person.
+    /// </summary>
+    /// <returns>List of PersonModel.</returns>
+    public List<PersonModel> GetPerson_All()
+    {
+        List<PersonModel> output;
+
+        using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
+        {
+            output = connection.Query<PersonModel>("dbo.spPeople_GetAll").ToList();
+        }
+
+        return output;
+    }
+
+    /// <summary>
+    /// Query the database to recover all data from table Teams.
+    /// </summary>
+    /// <returns>List of TeamModel.</returns>
+    public List<TeamModel> GetTeam_All()
+    {
+        List<TeamModel> output;
+
+        using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
+        {
+            // Getting all teams in db
+            output = connection.Query<TeamModel>("dbo.spTeam_GetAll").ToList();
+
+            foreach (TeamModel team in output)
+            {
+                // Creating the parameter for the query in stored procedure
+                var param = new DynamicParameters();
+                param.Add("@TeamId", team.Id);
+
+                team.TeamMembers = connection.Query<PersonModel>("dbo.spTeamMembers_GetByTeam", param, commandType: CommandType.StoredProcedure).ToList();
+            }
+        }
+
+        return output;
+    }
+}
 }

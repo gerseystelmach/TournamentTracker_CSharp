@@ -61,7 +61,7 @@ namespace TrackerUI
 
             } else
             {
-                MessageBox.Show("You need to fill in all of the fields.");
+                MessageBox.Show("You need to fill in all of the fields.", "Invalid fields", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
