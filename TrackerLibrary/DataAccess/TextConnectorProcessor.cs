@@ -88,6 +88,42 @@ namespace TrackerLibrary.DataAccess.TextHelpers
         }
 
         /// <summary>
+        /// It loops a List of lines, splits each line separated by a comma and transform the substrings into a TeamModel object attributes. 
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <param name="peopleFileName"></param>
+        /// <returns></returns>
+        public static List<TeamModel> ConvertToTeamModels(this List<string> lines, string peopleFileName)
+        {
+            List<TeamModel> output = new List<TeamModel>();
+
+            // Loading the PeopleFile and convert the text to List<PersonModel>
+            List<PersonModel> people = peopleFileName.FullFilePath().LoadFile().ConvertToPersonModels();
+
+            foreach (string line in lines)
+            {
+                string[] columns = line.Split(',');
+
+                TeamModel team = new TeamModel();
+
+                team.Id = int.Parse(columns[0]);
+                team.TeamName = columns[1];
+
+                string[] teamMembersIds = columns[2].Split("|");
+
+                foreach (string id in teamMembersIds)
+                {
+                    // Taking all the people in the text file,
+                    // filtering by the id of the person when it equals the passed id,
+                    // returning the first one found.
+                    team.TeamMembers.Add(people.Where(x => x.Id == int.Parse(id)).First());
+                }
+     
+            }
+            return output;
+        }
+
+        /// <summary>
         /// Writes a prize object into a flat file. 
         /// </summary>
         /// <param name="models"></param>
@@ -123,6 +159,49 @@ namespace TrackerLibrary.DataAccess.TextHelpers
             File.WriteAllLines(fileName.FullFilePath(), lines);
         }
 
+        /// <summary>
+        /// Save a list of TeamModels into a flat file.
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="fileName"></param>
+        public static void SaveToTeamFile(this List<TeamModel> models, string fileName)
+        {
+            List<string> lines = new List<string>();
+
+            // Converting object to string
+            foreach (TeamModel t in models)
+            {
+                lines.Add($"{t.Id}, {t.TeamName}, { convertPeopleListToString(t.TeamMembers) }");
+            }
+
+            File.WriteAllLines(fileName.FullFilePath(), lines);
+        }
+
+        /// <summary>
+        /// Transform a list of PersonModel into a string containing only the Id of each object.
+        /// </summary>
+        /// <param name="people"> </param>
+        /// <param name="separator">Character to separate each element.</param>
+        /// <returns>String with the Persons Ids separated by the separator.</returns>
+        private static string convertPeopleListToString(List<PersonModel> people)
+        {
+            string output = "";
+
+            if (people.Count == 0)
+            {
+                return "";
+            }
+
+            foreach (PersonModel person in people)
+            {
+                output += $"{ person.Id }|";
+            }
+
+            // Taking out the last pipe from the string
+            output = output.Substring(0, output.Length - 1);
+
+            return output;
+        }
 
     }
 }

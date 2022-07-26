@@ -100,6 +100,16 @@ namespace TrackerUI
             return true;
         }
 
+        private bool ValidateTeamNameForm()
+        {
+            if (teamNameValue.Text.Length == 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// It will assign default values for the Create Member Form. 
         /// </summary>
@@ -150,13 +160,17 @@ namespace TrackerUI
 
         private void createTeamButton_Click(object sender, EventArgs e)
         {
-            TeamModel teamModel = new TeamModel();
-
-            teamModel.TeamName = teamNameValue.Text;
-            teamModel.TeamMembers = selectedTeamMembers;
-
-            GlobalConfig.Connection.CreateTeam(teamModel);
-
+           
+            if (ValidateTeamNameForm())
+            {
+                TeamModel teamModel = new TeamModel();
+                teamModel.TeamName = teamNameValue.Text;
+                teamModel.TeamMembers = selectedTeamMembers;
+                GlobalConfig.Connection.CreateTeam(teamModel);
+            } else
+            {
+                MessageBox.Show("You need to fill the team name.");
+            }
             // TODO - If we aren't closing this form after creation, reset the form
         }
     }
