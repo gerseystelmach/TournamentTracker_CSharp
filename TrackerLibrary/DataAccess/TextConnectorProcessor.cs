@@ -88,10 +88,10 @@ namespace TrackerLibrary.DataAccess.TextHelpers
         }
 
         /// <summary>
-        /// It loops a List of lines, splits each line separated by a comma and transform the substrings into a TeamModel object attributes. 
+        /// It loops a List of string lines, splits each line separated by a comma and transform the substrings into a TeamModel object attributes. 
         /// </summary>
         /// <param name="lines"></param>
-        /// <param name="peopleFileName"></param>
+        /// <param name="peopleFileName">A file containing PeopleModels.</param>
         /// <returns></returns>
         public static List<TeamModel> ConvertToTeamModels(this List<string> lines, string peopleFileName)
         {
@@ -122,7 +122,7 @@ namespace TrackerLibrary.DataAccess.TextHelpers
             }
             return output;
         }
-
+        
         /// <summary>
         /// Writes a prize object into a flat file. 
         /// </summary>
@@ -203,5 +203,162 @@ namespace TrackerLibrary.DataAccess.TextHelpers
             return output;
         }
 
+        public static List<TournamentModel> ConvertToTournamentModels(
+        this List<string> lines,
+        string teamFileName,
+        string peopleFileName,
+        string prizeFileName)
+        {
+            //id, tournamentname, entryfee, (id|id|id - enteredTeams), (id|id|id - prizes), (Rounds - id^id^id|id^id^id|id^id^id)
+
+            List<TournamentModel> output = new List<TournamentModel>();
+            // Converting a file containing PeopleModels into TeamModel Object. 
+            List<TeamModel> teams = teamFileName.FullFilePath().LoadFile().ConvertToTeamModels(peopleFileName);
+            List<PrizeModel> prizes = prizeFileName.FullFilePath().LoadFile().ConvertToPrizeModels();
+
+            foreach (string line in lines)
+            {
+                string[] columns = line.Split(',');
+
+                TournamentModel tournamentModel = new TournamentModel();
+
+                tournamentModel.Id = int.Parse(columns[0]);
+                tournamentModel.TournamentName = columns[1];
+                tournamentModel.EntryFee = decimal.Parse(columns[2]);
+
+                string[] teamIds = columns[3].Split("|");
+
+                foreach (string id in teamIds)
+                {
+                    // Taking all the people in the text file,
+                    // filtering by the id of the person when it equals the passed id,
+                    // returning the first one found.
+                    tournamentModel.EnteredTeams.Add(teams.Where(x => x.Id == int.Parse(id)).First());
+                }
+
+                string[] prizesIds = columns[4].Split("|");
+
+                foreach (string id in prizesIds)
+                {
+                    tournamentModel.Prizes.Add(prizes.Where(x => x.Id == int.Parse(id)).First());
+                }
+
+                output.Add(tournamentModel);
+            }
+            return output;
+        }
+
+        public static void SaveToTournamentFile(this List<TournamentModel> models, string fileName)
+        {
+            List<string> lines = new List<string>();
+
+            foreach (TournamentModel tournament in models)
+            {
+                lines.Add($@"{ tournament.Id },
+                         { tournament.TournamentName },
+                         { tournament.EntryFee },
+                         { ConvertTeamListToString(tournament.EnteredTeams) }
+                         { ConvertPrizesToString(tournament.Prizes) },
+                         { ConvertRoundListToString(tournament.Rounds) }
+                         ");
+            }
+
+            File.WriteAllLines(fileName, lines);
+        }
+
+        private static string ConvertTeamListToString(List<TeamModel> teams)
+        {
+            string output = "";
+
+            if (teams.Count == 0)
+            {
+                return "";
+            }
+
+            foreach (TeamModel team in teams)
+            {
+                output += $"{team.Id}|";
+            }
+
+            // Taking out the last pipe from the string
+            output = output.Substring(0, output.Length - 1);
+
+            return output;
+        }
+
+        /// <summary>
+        /// Converting a list of PrizesModel into a string.
+        /// </summary>
+        /// <param name="prizes"></param>
+        /// <returns></returns>
+        private static string ConvertPrizesToString(List<PrizeModel> prizes)
+        {
+            string output = "";
+
+            if (prizes.Count == 0)
+            {
+                return "";
+            }
+
+            foreach (PrizeModel prize in prizes)
+            {
+                output += $"{prize.Id}|";
+            }
+
+            // Taking out the last pipe from the string
+            output = output.Substring(0, output.Length - 1);
+
+            return output;
+        }
+
+        /// <summary>
+        /// Converts a List of a List of MatchupModel into String.
+        /// </summary>
+        /// <param name="rounds"></param>
+        /// <returns></returns>
+        private static string ConvertRoundListToString(List<List<MatchupModel>> rounds)
+        {
+            string output = "";
+
+            if (rounds.Count == 0)
+            {
+                return "";
+            }
+
+            foreach (List<MatchupModel> round in rounds)
+            {
+                output += $"{ ConvertMatchupListToString(round) }|";
+            }
+
+            // Taking out the last pipe from the string
+            output = output.Substring(0, output.Length - 1);
+
+            return output;
+        }
+
+        /// <summary>
+        /// Converts a MatchupList into a string.
+        /// </summary>
+        /// <param name="matchups"></param>
+        /// <returns></returns>
+        private static string ConvertMatchupListToString(List<MatchupModel> matchups)
+        {
+            string output = "";
+
+            if (matchups.Count == 0)
+            {
+                return "";
+            }
+
+            foreach (MatchupModel matchup in matchups)
+            {
+                output += $"{ matchup.Id }^";
+            }
+
+            // Taking out the last pipe from the string
+            output = output.Substring(0, output.Length - 1);
+
+            return output;
+        }
     }
 }

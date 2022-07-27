@@ -12,6 +12,8 @@ namespace TrackerLibrary.DataAccess
 
         private const string databaseName = "Tournaments";
 
+        private static DynamicParameters param = new DynamicParameters();
+
         /// <summary>
         /// Saves a new person into the database.
         /// </summary>
@@ -22,8 +24,6 @@ namespace TrackerLibrary.DataAccess
             // It will open the connection to database and then close it, so it avoids memory leeks.  
             using (IDbConnection connection = new SqlConnection(GlobalConfig.getConnectionString(databaseName)))
             {
-                var param = new DynamicParameters();
-
                 // Replacing the parameters by the values of the PersonModel object.
                 param.Add("@FirstName", model.FirstName);
                 param.Add("@LastName", model.LastName);
@@ -41,8 +41,7 @@ namespace TrackerLibrary.DataAccess
                 return model;
             }
         }
-
-        // TODO - Make the CreatePrize method actually save to the database.
+       
         /// <summary>
         /// Saves a new prize into the database.
         /// </summary>
@@ -53,8 +52,6 @@ namespace TrackerLibrary.DataAccess
             // It will open the connection to database and then close it, so it avoids memory leeks.  
             using (IDbConnection connection = new SqlConnection(GlobalConfig.getConnectionString(databaseName)))
             {
-                var param = new DynamicParameters();
-
                 // Replacing the parameters by the values of the PrizeModel object.
                 param.Add("@PlaceNumber", model.PlaceNumber);
                 param.Add("@PlaceName", model.PlaceName);
@@ -118,91 +115,114 @@ namespace TrackerLibrary.DataAccess
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public TournamentModel CreateTournament(TournamentModel model)
+        public void CreateTournament(TournamentModel model)
         {
-
             using (IDbConnection connection = new SqlConnection(GlobalConfig.getConnectionString(databaseName)))
             {
-                var param = new DynamicParameters();
 
-                param.Add("@TournamentName", model.TournamentName);
-                param.Add("@EntryFee", model.EntryFee);
+                SaveTournamentIntoDb(connection, model);
+
+                SaveTournamentPrizesIntoDb(connection, model.Prizes);
+
+                SaveTournamentEnteredTeamsIntoDb(connection, model.EnteredTeams);
+
+            }
+        }
+
+        /// <summary>
+        /// Save a Tournament into database.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="model"></param>
+        private void SaveTournamentIntoDb(IDbConnection connection, TournamentModel model)
+        {     
+            param.Add("@TournamentName", model.TournamentName);
+            param.Add("@EntryFee", model.EntryFee);
+            param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            connection.Execute("dbo.spTournaments_Insert", param, commandType: CommandType.StoredProcedure);
+
+            model.Id = param.Get<int>("@id");
+        }
+
+        /// <summary>
+        ///  Save the Prizes atributte of a Tournament into database.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tournamentPrizes"></param>
+        private void SaveTournamentPrizesIntoDb(IDbConnection connection, List<PrizeModel> tournamentPrizes)
+        {
+            foreach (PrizeModel prize in tournamentPrizes)
+            {                
+                param.Add("@TournamentId", prize.Id);
+                param.Add("@PrizeId", prize.Id);
                 param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-
-                connection.Execute("dbo.spTournaments_Insert", param, commandType: CommandType.StoredProcedure);
-
-                model.Id = param.Get<int>("@id");
-
-                foreach (PrizeModel prize in model.Prizes)
-                {
-                    param = new DynamicParameters();
-
-                    param.Add("@TournamentId", model.Id);
-                    param.Add("@PrizeId", prize.Id);
-                    param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-                    connection.Execute("dbo.spTournamentPrizes_Insert", param, commandType: CommandType.StoredProcedure);
-
-                }
-                foreach (TeamModel team in model.EnteredTeams)
-                {
-                    param = new DynamicParameters();
-
-                    param.Add("@TournamentId", model.Id);
-                    param.Add("@TeamId", team.Id);
-                    param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-                    connection.Execute("dbo.spTournamentEntries_Insert", param, commandType: CommandType.StoredProcedure);
-
-               }
+                connection.Execute("dbo.spTournamentPrizes_Insert", param, commandType: CommandType.StoredProcedure);
 
             }
-            return model;
-        }
-    }
-
-
-    /// <summary>
-    /// Query the database to recover all data from table Person.
-    /// </summary>
-    /// <returns>List of PersonModel.</returns>
-    public List<PersonModel> GetPerson_All()
-    {
-        List<PersonModel> output;
-
-        using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
-        {
-            output = connection.Query<PersonModel>("dbo.spPeople_GetAll").ToList();
         }
 
-        return output;
-    }
-
-    /// <summary>
-    /// Query the database to recover all data from table Teams.
-    /// </summary>
-    /// <returns>List of TeamModel.</returns>
-    public List<TeamModel> GetTeam_All()
-    {
-        List<TeamModel> output;
-
-        using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
+        /// <summary>
+        /// Save the enteredTeams atributte of a Tournament into database.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="enteredTeams"></param>
+        private void SaveTournamentEnteredTeamsIntoDb(IDbConnection connection, List<TeamModel> enteredTeams)
         {
-            // Getting all teams in db
-            output = connection.Query<TeamModel>("dbo.spTeam_GetAll").ToList();
-
-            foreach (TeamModel team in output)
-            {
-                // Creating the parameter for the query in stored procedure
-                var param = new DynamicParameters();
+            foreach (TeamModel team in enteredTeams)
+            {               
+                param.Add("@TournamentId", team.Id);
                 param.Add("@TeamId", team.Id);
+                param.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-                team.TeamMembers = connection.Query<PersonModel>("dbo.spTeamMembers_GetByTeam", param, commandType: CommandType.StoredProcedure).ToList();
+                connection.Execute("dbo.spTournamentEntries_Insert", param, commandType: CommandType.StoredProcedure);
+
             }
         }
 
-        return output;
-    }
+        /// <summary>
+        /// Query the database to recover all data from table Person.
+        /// </summary>
+        /// <returns>List of PersonModel.</returns>
+        public List<PersonModel> GetPerson_All()
+        {
+            List<PersonModel> output;
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
+            {
+                output = connection.Query<PersonModel>("dbo.spPeople_GetAll").ToList();
+            }
+
+            return output;
+        }
+
+        /// <summary>
+        /// Query the database to recover all data from table Teams.
+        /// </summary>
+        /// <returns>List of TeamModel.</returns>
+        public List<TeamModel> GetTeam_All()
+        {
+            List<TeamModel> output;
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.getConnectionString(databaseName)))
+            {
+                // Getting all teams in db
+                output = connection.Query<TeamModel>("dbo.spTeam_GetAll").ToList();
+
+                foreach (TeamModel team in output)
+                {
+                    // Creating the parameter for the query in stored procedure
+                    var param = new DynamicParameters();
+                    param.Add("@TeamId", team.Id);
+
+                    team.TeamMembers = connection.Query<PersonModel>("dbo.spTeamMembers_GetByTeam", param, commandType: CommandType.StoredProcedure).ToList();
+                }
+            }
+
+            return output;
+        }
+
+    } 
 }
-}
+

@@ -123,14 +123,13 @@ namespace TrackerUI
 
         private void createTournamentButton_Click(object sender, EventArgs e)
         {
-
             // Validating data
 
             decimal fee = 0;
             // trying to convert it into decimal type,
             // if it successful, it will send the value,
             // if it's not, it will send a false and send the value of 0
-            bool feeAcceptable = decimal.TryParse(entryFeeValue.Text, out fee);
+            bool feeAcceptable = decimal.TryParse(entryFeeTextBoxValue.Text, out fee);
 
             if (!feeAcceptable)
             {
@@ -145,13 +144,20 @@ namespace TrackerUI
 
             tournament.TournamentName = tournamentNameValue.Text;
             tournament.EntryFee = fee;
-
             tournament.Prizes = selectedPrizes;
             tournament.EnteredTeams = selectedTeams;
 
-            // Create all of the prizes enties
-            // Create all of the team entries
-            // Create matchups rounds
+            // TODO - Create matchups rounds
+            // ORder our list randomly of teams
+            // Check if it is big enough - if not, add in byes - 2 * 2 * 2 * 2 - 2^4
+            // Create our first round of matchups
+            // Create every round after that
+
+            // This method will be called in accordance to the Connector class (indicated in the Program.cs).
+            // It holds any class that implements it. 
+            GlobalConfig.Connection.CreateTournament(tournament);
+
+            
         }
     }
 }
